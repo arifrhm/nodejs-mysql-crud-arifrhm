@@ -2,6 +2,8 @@ const express = require('express'),
     path = require('path'),
     morgan = require('morgan'),
     mysql = require('mysql2'),
+    { Pool, Client } = require('pg'),
+    psql = new Pool(),
     myConnection = require('express-myconnection');
 
 const app = express();
@@ -16,12 +18,12 @@ app.set('view engine', 'ejs');
 
 // middlewares
 app.use(morgan('dev'));
-app.use(myConnection(mysql, {
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    port: 3306,
-    database: 'nodejs2'
+app.use(myConnection(psql, {
+    huser: 'naohwsvalqcznu',
+    host: 'ec2-54-91-223-99.compute-1.amazonaws.com',
+    database: 'dfo0f3jgqtrsj9',
+    password: '048b6aa8ac5b19522a239c3fd42407478e099da201be1cdc5b432a2a8c3e45d6',
+    port: 5432,
 }, 'single'));
 app.use(express.urlencoded({extended: false}));
 
