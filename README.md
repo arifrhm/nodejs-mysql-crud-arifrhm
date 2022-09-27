@@ -3,7 +3,7 @@
 Run this project by this command :
 
 1. `npm install`
-2. `node src/index.js`
+2. `node src/index.js`  or `npm run start`
 3. `localhost:3000`
 
 #### Screen shot
