@@ -1,10 +1,8 @@
 const express = require('express'),
     path = require('path'),
     morgan = require('morgan'),
-    mysql = require('mysql2'),
-    { Pool, Client } = require('pg'),
-    psql = new Pool(),
-    myConnection = require('express-myconnection');
+    { Pool } = require('pg');
+
 
 const app = express();
 
@@ -18,13 +16,33 @@ app.set('view engine', 'ejs');
 
 // middlewares
 app.use(morgan('dev'));
-app.use(myConnection(psql, {
-    huser: 'naohwsvalqcznu',
-    host: 'ec2-54-91-223-99.compute-1.amazonaws.com',
-    database: 'dfo0f3jgqtrsj9',
-    password: '048b6aa8ac5b19522a239c3fd42407478e099da201be1cdc5b432a2a8c3e45d6',
+
+function connectionMiddleware(connectionData) {
+    const pool = new Pool(connectionData);
+    return (req, res, next) => {
+        req.pool = pool;
+        next();
+    }
+}
+
+app.use(connectionMiddleware({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'bex',
+    password: 'postgres',
     port: 5432,
-}, 'single'));
+}));
+
+app.use((req, res, next) => {
+    req.pool.connect((err, client, release) => {
+        client.query('SELECT NOW()', (err, result) => {
+             release();
+             if (err) return next(err);
+             console.log(result.rows);
+             res.send(200);
+         });   
+    });
+});
 app.use(express.urlencoded({extended: false}));
 
 // routes
