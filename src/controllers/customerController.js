@@ -2,10 +2,7 @@ const controller = {};
 const { Client } = require('pg');
 
 const client = new Client({
-  connectionString: 'postgres://naohwsvalqcznu:048b6aa8ac5b19522a239c3fd42407478e099da201be1cdc5b432a2a8c3e45d6@ec2-54-91-223-99.compute-1.amazonaws.com:5432/dfo0f3jgqtrsj9',
-  ssl: {
-    rejectUnauthorized: false
-  }
+  connectionString: 'postgres://arifrahman:RSCunited2021@localhost:5432/nodejs2'
 });
 console.log(client);
 client.connect();
@@ -21,10 +18,10 @@ client.query('SELECT table_schema,table_name FROM information_schema.tables;', (
 controller.list = (req, res) => {
         client.query('SELECT * FROM customer', (err, customers) => {
             if (err) {
-                res.json(err);
+                res.status(404).json(err);
             }
-            res.render('customers', {
-                data: customers
+            res.json({
+                data: customers?.fields || []
             });
         });
 };
@@ -34,7 +31,7 @@ controller.save = (req, res) => {
     console.log(req.body);
         const query = client.query('INSERT INTO customer set ?', data, (err, customer) => {
             console.log(customer);
-            res.redirect('/');
+            res.json(req.body);
         })
 };
 
