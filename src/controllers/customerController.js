@@ -17,13 +17,15 @@ client.query('SELECT table_schema,table_name FROM information_schema.tables;', (
 
 controller.list = (req, res) => {
         client.query('SELECT * FROM customer', (err, customers) => {
+            console.log(customers);
             if (err) {
-                res.status(404).json(err);
+                res.status(404).json({err: "No data found"});
             }
             res.json({
                 data: customers?.fields || []
             });
         });
+        client.end();
 };
 
 controller.save = (req, res) => {
@@ -31,8 +33,15 @@ controller.save = (req, res) => {
     console.log(req.body);
         const query = client.query('INSERT INTO customer set ?', data, (err, customer) => {
             console.log(customer);
-            res.json(req.body);
+            if (err){
+                res.status(404).json(err);
+            }
+            res.json({
+                data: customer || []
+            });
         })
+    console.log(query);
+    client.end();
 };
 
 controller.edit = (req, res) => {
@@ -42,6 +51,8 @@ controller.edit = (req, res) => {
                 data: rows[0]
             })
         });
+    console.log(query);
+    client.end();
 };
 
 controller.update = (req, res) => {
@@ -50,6 +61,7 @@ controller.update = (req, res) => {
         client.query('UPDATE customer set ? where id = ?', [newCustomer, id], (err, rows) => {
             res.redirect('/');
         });
+    client.end();
 };
 
 controller.delete = (req, res) => {
@@ -57,6 +69,7 @@ controller.delete = (req, res) => {
         client.query('DELETE FROM customer WHERE id = ?', [id], (err, rows) => {
             res.redirect('/');
         });
+    client.end();
 };
 
 module.exports = controller;
